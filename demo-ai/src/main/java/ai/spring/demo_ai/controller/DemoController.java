@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/ai")
@@ -24,6 +25,9 @@ public class DemoController {
 
     @Value("classpath:/prompts/list-prompt.st")
     private Resource listPrompt;
+
+    @Value("classpath:/prompts/map-prompt.st")
+    private Resource mapPrompt;
 
     public DemoController(ChatClient.Builder chatClientBuilder) {
         this.chatClient = chatClientBuilder.build();
@@ -71,4 +75,15 @@ public class DemoController {
                 .call()
                 .entity(Author.class);
     }
+
+    // MapOutputConverter
+    @GetMapping("/prompt/map")
+    public Map<String, Object> getAuthorsSocialLinks() {
+        return this.chatClient.prompt()
+                .user(u -> u.text(mapPrompt))
+                .call()
+                .entity(new ParameterizedTypeReference<Map<String, Object>>() {});
+    }
+
+
 }
