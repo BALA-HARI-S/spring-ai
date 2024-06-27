@@ -10,11 +10,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/ai")
+
 public class DemoController {
 
     // client interface that interacts with a chatbot or AI service to process and respond to user inputs.
@@ -28,6 +31,12 @@ public class DemoController {
 
     @Value("classpath:/prompts/map-prompt.st")
     private Resource mapPrompt;
+
+    @Value("classpath:/prompts/breezeware.st")
+    private Resource breezewarePrompt;
+
+    @Value("classpath:/docs/breezeware.txt")
+    private Resource breezewareDocs;
 
     public DemoController(ChatClient.Builder chatClientBuilder) {
         this.chatClient = chatClientBuilder.build();
@@ -64,11 +73,12 @@ public class DemoController {
         return this.chatClient.prompt()
                 .user(u -> u.text(listPrompt))
                 .call()
-                .entity(new ParameterizedTypeReference<>() {});
+                .entity(new ParameterizedTypeReference<>() {
+                });
     }
 
     // BeanOutputConverter
-    @GetMapping("/prompt/list")
+    @GetMapping("/prompt/bean")
     public Author getAuthor() {
         return this.chatClient.prompt()
                 .user(u -> u.text(listPrompt))
@@ -82,8 +92,26 @@ public class DemoController {
         return this.chatClient.prompt()
                 .user(u -> u.text(mapPrompt))
                 .call()
-                .entity(new ParameterizedTypeReference<Map<String, Object>>() {});
+                .entity(new ParameterizedTypeReference<Map<String, Object>>() {
+                });
     }
 
+    // Prompt stuffing
+    @GetMapping("/prompt/stuff")
+    public String getBreezewareInfo(
+            @RequestParam(name = "message", defaultValue = "Tell me about Breezeware IT company") String message,
+            @RequestParam(name = "stuffit", defaultValue = "false") boolean stuffit
+    ) throws IOException {
+        String breezeware = breezewareDocs.getContentAsString(Charset.defaultCharset());
+        System.out.printf("Sports: %s%n", breezeware);
+        return chatClient.prompt()
+                .user(u -> {
+                    u.text(breezewarePrompt);
+                    u.param("question", message);
+                    u.param("context", stuffit ? breezeware : "");
+                })
+                .call()
+                .content();
+    }
 
 }

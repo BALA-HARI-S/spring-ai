@@ -1,0 +1,8 @@
+Breezeware Platform
+
+WHAT IS DYNAMO
+
+Dynamo is a powerful open-source platform that streamlines the configuration, building, deployment,
+and management of cloud-native applications. its vast collection of reusable building blocks,
+developers can save valuable time, effort, and resources,
+allowing them to focus on creating innovative solutions that drive business growth.
