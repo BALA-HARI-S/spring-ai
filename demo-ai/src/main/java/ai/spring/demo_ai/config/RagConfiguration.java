@@ -20,10 +20,10 @@ import java.util.List;
 @Configuration
 public class RagConfiguration {
 
-    @Value("vectorstore.json")
+    @Value("vectorStore.json")
     private String vectorStoreName;
 
-    @Value("classpath:/docs/olympic-faq.txt")
+    @Value("classpath:/docs/olympicsFAQ.txt")
     private Resource faq;
 
     @Bean
@@ -37,7 +37,7 @@ public class RagConfiguration {
         } else {
             System.out.println("Vector Store File Does Not Exist, loading documents");
             TextReader textReader = new TextReader(faq);
-            textReader.getCustomMetadata().put("filename", "olympic-faq.txt");
+            textReader.getCustomMetadata().put("filename", "olympicsFAQ.txt");
             List<Document> documents = textReader.get();
             TextSplitter textSplitter = new TokenTextSplitter();
             List<Document> splitDocuments = textSplitter.apply(documents);
