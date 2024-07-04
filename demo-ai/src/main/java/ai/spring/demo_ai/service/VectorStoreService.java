@@ -7,6 +7,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.transformer.splitter.TextSplitter;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
@@ -43,10 +44,15 @@ public class VectorStoreService {
         for (Document document: documents) {
             stringBuilder.append(document.getContent());
         }
+
+        OpenAiChatOptions chatOption = OpenAiChatOptions.builder()
+                .withFunction("currentWeatherFunction")
+                .build();
+
         Message userMessage = new UserMessage(message);
         Message systemMessage = new SystemPromptTemplate(systemPrompt)
                 .createMessage(Map.of("input", message, "documents", stringBuilder.toString()));
-        Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
+        Prompt prompt = new Prompt(List.of(systemMessage, userMessage), chatOption);
         return chatClient.prompt(prompt)
                 .call()
                 .content();
